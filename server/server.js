@@ -10,6 +10,7 @@ app.use((req, res, next) => {
 	next()
 })
 
+app.use(express.static(path.join(__dirname, '../', 'public/')))
 
 app.get(/.*/, function root(req, res){
 	res.sendFile(path.join(__dirname, '../', 'public/index.html'))

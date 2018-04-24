@@ -1,7 +1,8 @@
 import React from 'react'
 import { Link, Route, Switch } from 'react-router-dom'
-/*import AppActions from '../flux/actions/AppActions.js'
-import AppStore from '../flux/stores/AppStore.js'*/
+import AppActions from '../flux/actions/AppActions.js'
+/*import AppStore from '../flux/stores/AppStore.js'*/
+
 
 class App extends React.Component{
 	constructor(props){
