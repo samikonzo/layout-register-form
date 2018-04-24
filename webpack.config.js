@@ -19,22 +19,6 @@ const rules = {
 		],
 		exclude : ['/node_modules/', 'public']
 	},
-	/*js : {
-		test 	: /\.js$/,
-		loader 	: 'babel-loader',
-		exclude : ['/node_modules/', 'public']
-	},
-
-	css : {
-		test 	: /\.css$/,
-		use 	: [
-			'style-loader',
-			'css-loader'
-		],
-		exclude : ['/node_modules/', 'public']
-	},
-
-	*/
 }
 
 
@@ -47,14 +31,14 @@ module.exports = {
 		filename: 'script.js'
 	},
 	module: {
-		rules: [rules.jsx]
+		rules: [rules.jsx, rules.less]
 	},
 	devServer : {
-		//historyApiFallback	: true,
-		proxy: {
+		historyApiFallback	: true,
+		/*proxy: {
 			'*' : {
 				target: 'http://localhost:3000'
 			}
-		},
+		},*/
 	}
 }
