@@ -4,7 +4,71 @@
 	box-sizing: border-box;
 	width: 100%;
 	height: 100%;
+	background: rgb(236, 237, 241);
+
+	display: flex;
+	flex-flow: column;
+	justify-content: center;
+	-ms-align-items: center;
+	align-items: center;
 }
 
-.RegisterForm_form{}
-.RegisterForm_header{}
+.RegisterForm_form{
+	border: 1px solid rgb(228, 229, 233);
+	background: white;
+}
+
+.RegisterForm_header{
+	text-align: center;
+	padding: 60px 0 0 0;
+}
+
+.RegisterForm_main{
+	padding: 0px 95px 20px;
+}
+
+.RegisterForm_note{
+	color: grey;
+}
+
+.RegisterForm_submit{
+	background: rgb(138, 172, 157);
+	border-radius: 3px;
+	padding: 15px 50px;
+	outline: none;
+	border: none;
+	color: white;
+	cursor: pointer;
+	display: block;
+	margin: auto;
+	font-weight: bold;
+	transition: .2s;
+
+	&:active{
+		background: darken(rgb(138, 172, 157), 10%);
+	}
+}
+
+.RegisterForm_footer{
+	border-top: 1px solid rgb(228, 229, 233);
+	background: rgb(248, 248, 248);
+	width: 100%;
+	text-align: center;
+	padding: 30px 0;
+
+	& span a{
+		color: rgb(92, 166, 135);
+	}	
+}
+
+.requiredAsterisk{
+	&::before{
+		content: '*';
+		position: relative;
+		top: -4px;
+		left: 2px;
+		display: inline-block;
+		color: darken(red, 10%);
+		font-size:10px;
+	}
+}

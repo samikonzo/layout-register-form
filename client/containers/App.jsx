@@ -1,7 +1,6 @@
 import React from 'react'
 import RegisterForm from '../components/RegisterForm.jsx'
 
-
 class App extends React.Component{
 	constructor(props){
 		super(props)
@@ -12,7 +11,7 @@ class App extends React.Component{
 
 	render(){
 		return (
-			<div> 
+			<div className="App"> 
 				<RegisterForm />
 			</div>
 		)

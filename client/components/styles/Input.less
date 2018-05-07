@@ -1,0 +1,84 @@
+.Input{
+	width: 100%;
+	position: relative;
+	//border: 1px dashed blue;
+
+	&-username{}
+	&-email{}
+	&-emailSecond{}
+	&-password{}
+}
+
+.Input_label{
+	display: block;
+	padding-top: 20px;
+	//border: 1px dashed blue;
+	cursor: pointer;
+
+	&:hover .Input_input:not(:focus){
+		background: gold;
+	}
+}
+
+.Input_name{
+	font-weight: bold;
+}
+
+.Input_input{
+	@backcolor: lighten(lightgrey, 15%);
+
+	display: block;
+	height: 40px;
+	width: 100%;
+	border: 1px solid darken(@backcolor, 10%);
+	border-radius: 2px;
+	outline: none;
+	background: @backcolor;
+	padding-left: 10px;
+	box-sizing: border-box;
+
+	&:focus{
+		background: white;
+	}
+
+	&--error{
+		border-color: darken(red, 10%);
+	}
+}
+
+.Input_error{
+	width: 100%;
+	text-align: right;
+	color: darken(red, 10%);
+	font-size: 14px;
+
+	&--empty{
+	}
+}
+
+.Input_note{
+	font-size: 14px;
+	color: lighten(grey, 10%);
+	margin-left: 10px;
+	position: relative;
+
+	&::before{
+		position: absolute;
+		left: -14px;
+		content: "\1f512";
+		font-size: 12px;
+	}
+}
+
+.Input_showPassword{
+	position: absolute;
+	top: 18px;
+	right: 0;
+	//border: 1px dashed red;
+
+	& input{
+		border: none;
+		width: 40px;
+		border: 1px solid red;
+	}
+}

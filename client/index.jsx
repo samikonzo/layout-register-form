@@ -1,3 +1,5 @@
+global.l = console.log
+
 import React from 'react'
 import ReactDom from 'react-dom'
 import App from './containers/App.jsx'
