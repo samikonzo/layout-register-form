@@ -9,23 +9,101 @@
 	&-password{}
 }
 
-.Input_label{
-	display: block;
-	padding-top: 20px;
-	//border: 1px dashed blue;
-	cursor: pointer;
 
-	&:hover .Input_input:not(:focus){
-		background: gold;
-	}
+
+.Input_header{
+	width: 100%;
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: space-between;
+	//border: 1px dashed blue;
+	padding-top: 20px;
 }
 
 .Input_name{
 	font-weight: bold;
+	flex: 1 1 auto;
+	//border: 1px dashed green;
+	cursor: pointer;
+
+	&--available .requiredAsterisk{
+		&::before{
+			color: darken(green, 10%);
+		}
+	}
+}
+
+.Input_showPassword{
+	margin-left: auto;
+	top: 18px;
+	right: 0;
+	cursor: pointer;
+	user-select: none;
+	
+	& span{
+		position: relative;
+		display: block;
+		padding-left: 45px;
+		border-bottom: 1px solid transparent;
+		overflow: hidden;
+		transition: .5s;
+		
+		&:hover{
+			//padding-left: 42px;
+
+			&::before, &::after{
+			}
+		}
+
+		&::before{
+			position: absolute;
+			content: 'Show';
+			opacity: 1;
+			left: 0px;
+			top: 0px;
+			transition: .5s;
+		}
+
+		&::after{
+			position: absolute;
+			content: 'Hide';
+			opacity: 0;
+			left: 5px;
+			top: 100%;
+			transition: .5s;
+		}
+	}
+
+
+	& input{
+		display: none;
+
+		&:checked + span{
+			color: darken(red, 20%);
+			
+			&::before{
+				top: -100%;
+				opacity: 0;
+			}
+
+			&::after{
+				opacity: 1;
+				top: 0;
+			}
+		}
+	}
+
+}
+
+.Input_label{
+	display: block;
+	
+	//border: 1px dashed blue;
+	cursor: pointer;
 }
 
 .Input_input{
-	@backcolor: lighten(lightgrey, 15%);
+	@backcolor: lighten(lightgrey, 13%);
 
 	display: block;
 	height: 40px;
@@ -39,6 +117,12 @@
 
 	&:focus{
 		background: white;
+
+
+	}
+
+	&--available{
+		border-color: darken(green, 10%);
 	}
 
 	&--error{
@@ -46,11 +130,121 @@
 	}
 }
 
+.Input_loading{
+	position: absolute;
+	width: 40px;
+	height: 40px;
+	top: 40px;
+	right: -40px;
+	box-sizing: border-box;
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: center;
+	-ms-align-items: center;
+	align-items: center;
+	opacity: 0;
+	transition: .5s;
+
+
+	// center
+	& div:last-child{
+		position: absolute;
+		width: 24px;
+		height: 24px;
+		border-radius: 50%;
+		background: white;
+		border: none;
+	}
+
+	// circles
+	& div:first-child{
+		width: 30px;
+		height: 30px;
+		background: rgb(138, 172, 157);
+		border-radius: 50%;
+		overflow: hidden;
+		position: relative;
+		border: none;
+		animation: loader 6s .5s infinite;;
+
+		&::before{
+			content: '';
+			position: absolute;
+			left: 50%;
+			top: -50%;
+			width: 100%;
+			height: 100%;
+			background: white;
+			transform-origin: left bottom;
+			transform: skewY(90 + 30deg);
+			//display: none;
+			animation: loader_sector 3s infinite alternate;
+			border: none;
+		}
+
+		&::after{
+			content: '';
+			position: absolute;
+			left: -50%;
+			top: 50%;
+			width: 100%;
+			height: 100%;
+			background: white;
+			transform-origin: right top;
+			transform: skewY(90 + 30deg);
+			animation: loader_sector2 3s infinite alternate;
+			border: none;
+		}
+	}
+
+
+	&--show{
+		opacity: 1;
+	}	
+}
+
+
+@keyframes loader{
+	from{
+		transform:  rotate(0deg);
+	}
+
+	to{
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes loader_sector{
+	from{
+		transform: skewY(90 + 0deg)
+	}
+
+
+	to{
+		transform: skewY(90 + 90deg)
+	}
+}
+
+@keyframes loader_sector2{
+	from{
+		transform: skewY(90 + 0deg)
+	}
+
+	to{
+		transform: skewY(90 + 90deg)
+	}
+}	
+
+
 .Input_error{
 	width: 100%;
 	text-align: right;
 	color: darken(red, 10%);
 	font-size: 14px;
+	//max-height: 150px;
+	//border: 1px dashed blue;
+	overflow: hidden;
+	transition: 1s;
 
 	&--empty{
 	}
@@ -59,6 +253,7 @@
 .Input_note{
 	font-size: 14px;
 	color: lighten(grey, 10%);
+	margin-top: 6px;
 	margin-left: 10px;
 	position: relative;
 
@@ -70,15 +265,3 @@
 	}
 }
 
-.Input_showPassword{
-	position: absolute;
-	top: 18px;
-	right: 0;
-	//border: 1px dashed red;
-
-	& input{
-		border: none;
-		width: 40px;
-		border: 1px solid red;
-	}
-}

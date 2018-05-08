@@ -15,7 +15,10 @@ class RegisterForm extends React.Component{
 				email2: 'Spare mail',
 				password: 'Password must be at least 6 characters long',
 				notRequired: '',
-			}
+			},
+			submitLoading: false,
+			promiseArr: [],
+
 		}
 
 		this._formSubmit = this._formSubmit.bind(this)
@@ -26,7 +29,38 @@ class RegisterForm extends React.Component{
 	}
 
 	_formSubmit(e){
-		e.preventDefault()
+		e && e.preventDefault() && e.persist()
+
+
+		if(this.state.submitLoading) return
+
+		this.setState({
+			submitLoading: true,
+		})
+
+		let formValidate = false
+		let inputs = e.target.elements
+		let requiredInputs = [].filter.call(inputs, input => input.dataset.required == 'true')
+		formValidate = requiredInputs.every(input => input.dataset.validate == 'true')
+		
+		if(!formValidate){
+			let checkEvent = new CustomEvent('check',{bubbles: false})
+
+			// need to wait for off loading
+			requiredInputs.forEach(input => {input.dispatchEvent(checkEvent)})
+
+			Promise.all(this.state.promiseArr).then(() => {
+				this.setState({
+					submitLoading: false
+				}, () => {
+					this.submitBtn.click()
+				})
+			})
+
+			return
+		} 
+
+		l(' SUBMIT! ')
 	}
 
 	_checkUsername(value){
@@ -51,18 +85,24 @@ class RegisterForm extends React.Component{
 
 		if(checkResult.result){
 			return new Promise( (resolve, reject) => {
+				l('send to server...waiting...')
 				// servercheck emulation
 				if(value.includes('admin')){
 					setTimeout(() => {
-						resolve('true')
+						l('good email')
+						resolve({result: true})
 					}, 1000)
 				} else {
+
+
 					setTimeout(() => {
-						reject('unavailable email')
-					}, 1000)
+						l('bad email')
+						reject({result: false, error: 'only email with "admin" works'})
+					}, 2000)
 				}
 			})
 		} else {
+			l('bad email, no servercheck')
 			return checkResult
 		}
 	}
@@ -77,6 +117,10 @@ class RegisterForm extends React.Component{
 
 
 	render(){
+
+		let submitClassName = 'RegisterForm_submit '
+		if(this.state.submitLoading) submitClassName += 'RegisterForm_submit--loading '
+
 		return(
 			<div className="RegisterForm">
 				<form action="/" method="post" onSubmit={this._formSubmit} className="RegisterForm_form">
@@ -91,6 +135,7 @@ class RegisterForm extends React.Component{
 							required="true"
 							checkFunction={this._checkUsername}
 							note={this.state.notes.username}
+							promiseArr={this.state.promiseArr}
 						/>
 
 						<Input 
@@ -99,6 +144,7 @@ class RegisterForm extends React.Component{
 							required="true"
 							checkFunction={this._checkEmail}
 							note={this.state.notes.email}
+							promiseArr={this.state.promiseArr}
 						/>
 
 						{/*<Input 
@@ -115,24 +161,32 @@ class RegisterForm extends React.Component{
 							type="password" 
 							checkFunction={this._checkPassword}
 							note={this.state.notes.password}
+							promiseArr={this.state.promiseArr}
 						/>
 
-						{/*<Input
+						<Input
 							className="notRequired"
 							name="Not Required"
 							checkFunction={this._checkNotRequired}
 							note={this.state.notes.notRequired}
-						/>*/}
+							promiseArr={this.state.promiseArr}
+						/>
 
 						<p className="RegisterForm_note">
 							<span className='requiredAsterisk'></span> Required fields
 						</p>
 
-						<input 
-							className="RegisterForm_submit"
-							type="submit"
-							value="Sign Up"
-						/>
+						<label className={submitClassName}> 
+							<input 
+								className="RegisterForm_submit-btn"
+								type="submit"
+								value="Sign Up"
+								ref={elem => this.submitBtn = elem}
+							/>
+
+							<div className="RegisterForm_submit-loader"> <div></div> <div></div> </div>
+						</label>
+
 					</main>
 
 					<footer className="RegisterForm_footer">

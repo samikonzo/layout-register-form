@@ -1,7 +1,7 @@
 import React from 'react'
 import './styles/Input.less'
 
-// ;ike throttle
+// like throttle
 function changeWaiter (f, time) {
 	function waiterFunc(){
 		if(waiterFunc.timer){
@@ -30,12 +30,21 @@ class Input extends React.Component{
 			value: '',
 			available: false, 
 			loading: false,
+			id: `id_${props.name ? props.name.split(' ').join('-') : ''}_${(Math.random()).toString(36).slice(2).split('.').join('')}`
 		}
 
 		this.showPasswordHandler = this.showPasswordHandler.bind(this)
 		this.onChangeHandler = this.onChangeHandler.bind(this)
-		this.checkInput = changeWaiter( this.checkInput.bind(this), 1000).bind(this)
-		
+		this.checkInput_waited = changeWaiter( this.checkInput.bind(this), 1000).bind(this)
+		this.externalCheckInput = this.externalCheckInput.bind(this)
+	}
+
+	componentDidMount(){
+		this.elem.addEventListener('check', this.externalCheckInput)
+	}
+
+	componentWillUnmount(){
+		this.elem && this.elem.removeEventListener('check', this.externalCheckInput)	
 	}
 
 	showPasswordHandler(e){
@@ -46,66 +55,106 @@ class Input extends React.Component{
 	onChangeHandler(e){
 		e.persist()
 
-
 		if(!this.state.checkFunction){
 			if(this.state.error) this.setState({error : undefined})
 		}
 
 		this.setState({value : e.target.value},
-			this.checkInput()
+
+			/* remove commetns 
+			*
+			*/
+			
+			//this.checkInput_waited()
+			
+			/*
+			*
+			*/
+
 		)
 	}
 
+	externalCheckInput(){
+		//if(this.state.error) return
+
+		let promise = this.checkInput()
+
+		this.props && 
+			this.props.promiseArr && 
+				this.props.promiseArr.push && 
+					this.props.promiseArr.push( promise ) 
+	}
+
 	checkInput(){
-		if(!this.state.checkFunction) return
+		var promise = new Promise((resolve, reject) => {
 
-		// random seed	
-		let seed =  Math.random().toString(36)
-		this.checkInput.lastSeed = seed;
-		
-		var result = this.state.checkFunction(this.state.value)
+			if(!this.state.checkFunction) return
 
-
-		if(typeof result == 'boolean'){ 
-			// result true | false
 			this.setState({
-				available: result,
-				error: !result ? 'undefined error' : ''
-			})
+				loading: true
+			}, () => {
+			
+				var result = this.state.checkFunction(this.state.value)
 
-		} else if(result && result.then){
-			// result promise
-			result.then(
-				ok => {
-					l('ok : ', ok)
-				},
-				fail => {
-					l('fail : ', fail)
+				if(typeof result == 'boolean'){ 
+					// result true | false
+					this.setState({
+						available: result,
+						error: !result ? 'undefined error' : '',
+						loading: false,
+					}, resolve)
+
+				} else if(result && result.then){
+					// result promise
+
+										result.then(
+						data => {
+							l('ok : ', data)
+							this.setState({
+								loading: false,
+								available: data.result,
+								error: data.error
+							}, resolve)
+						},
+						data => {
+							l('fail : ', data)
+							this.setState({
+								loading: false,
+								available: data.result,
+								error: data.error
+							}, resolve)
+						}
+					)
+
+				} else if(result !== undefined){
+					// result {result: true | false, error?: str}			
+					this.setState({
+						loading: false,
+						available: result.result,
+						error: result.error
+					}, resolve)
+
+				} else {
+					// no result
+					this.setState({
+						loading: false,
+						error: 'check error'
+					}, resolve)
 				}
-			)
 
-		} else if(result !== undefined){
-			// result {result: true | false, error?: str}			
-			this.setState({
-				available: result.result,
-				error: result.error
 			})
+			
+		})
 
-		} else {
-			// no result
-			this.setState({
-				error: 'check error'
-			})
-		}
-		
-	
+		return promise
 	}
 
 	render(){
 		//l(this.props)
-		let { type } = this.state
+		let { type, available, error, value, loading } = this.state
 		let { type: originalType = 'text' ,name, note, required, className } = this.props
 		//l(type, originalType, name, note, required, className)
+		required = (required === 'true') ? true : false
 
 		let baseClassName = 'Input'
 
@@ -115,50 +164,63 @@ class Input extends React.Component{
 			wrapperClassName += `Input-${addedName} `
 		})
 
+		//l(available, required)
 		let labelClassName = 'Input_label '
+		let headerClassName = 'Input_header '
+
 		let nameClassName = 'Input_name '
+		if(available && required) nameClassName += 'Input_name--available '	
+
 		let inputClassName = 'Input_input '
-		if(this.state.error) inputClassName += 'Input_input--error '
+		if(error && required) inputClassName += 'Input_input--error '
+
+		let loadingClassName = 'Input_loading '	
+		if(loading) loadingClassName += 'Input_loading--show'
+
 		let errorClassName = 'Input_error '
-		if(!this.state.error) errorClassName += 'Input_error--empty '
+		if(error) errorClassName += 'Input_error--empty '
+			
 		let noteClassName = 'Input_note '
 		let showPasswordClassName = 'Input_showPassword'
 
 		return(
 			<div className={wrapperClassName}>
 
-				{originalType === 'password' &&
-					<label className={showPasswordClassName}>
-						<input type="checkbox" ref={elem => this.showPassword = elem} onChange={this.showPasswordHandler}/>
-						Show password
-					</label>	
-				}
-
-				<label className={labelClassName}>
+				<div className={headerClassName}>
 					{name && 
-						<div className={nameClassName}> 
+						<label className={nameClassName} htmlFor={this.state.id}> 
 							{name}
-							{(this.props.required == 'true') &&
+							{(required == true) &&
 								<span className="requiredAsterisk"></span>
 							}
-
-						</div>
-
+						</label>
 					}
 
+					{originalType === 'password' &&
+						<label className={showPasswordClassName}>
+							<input type="checkbox" ref={elem => this.showPassword = elem} onChange={this.showPasswordHandler}/>
+							<span> password </span>
+						</label>	
+					}
+				</div>
 
+				<label className={labelClassName}>
 					<input 
+						id={this.state.id}
 						className={inputClassName}
 						autoComplete="off"
 						type={type || "text"}
 						ref={elem => this.elem = elem}
-						value={this.state.value}
+						value={value}
 						onChange={this.onChangeHandler}
+						data-required={required}
+						data-validate={required ? available : true}
 					/>
 
-					{this.state.error &&
-						<div className={errorClassName}>{this.state.error}</div>
-					}
+					<div className={loadingClassName}> <div></div> <div></div> </div>
+
+					<div className={errorClassName}>{this.state.error}</div>
+
 
 					{this.props.note && this.props.note.length &&
 						<div className={noteClassName}>{this.props.note}</div>
